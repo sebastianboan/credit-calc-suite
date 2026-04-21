@@ -1,4 +1,12 @@
-import { useMemo, useState, useCallback, type ChangeEvent, type ClipboardEvent } from "react";
+import {
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+  type ChangeEvent,
+  type ClipboardEvent,
+  type KeyboardEvent,
+} from "react";
 import * as XLSX from "xlsx";
 import {
   computeRow,
