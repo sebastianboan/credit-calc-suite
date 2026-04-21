@@ -682,36 +682,42 @@ function ResultCells({
   );
 }
 
-function ObservationCell({ res }: { res: RowResult }) {
-  if (res.estado === "empty" && !res.observacion)
-    return <span className="text-xs text-muted-foreground">—</span>;
-  const cfg = {
-    ok: {
-      cls: "text-[oklch(0.45_0.12_155)] bg-[oklch(0.95_0.05_155)]",
-      icon: <CheckCircle2 className="h-3.5 w-3.5" />,
-    },
-    warning: {
-      cls: "text-[oklch(0.45_0.14_60)] bg-[oklch(0.96_0.07_75)]",
-      icon: <AlertTriangle className="h-3.5 w-3.5" />,
-    },
-    error: {
-      cls: "text-destructive bg-destructive/10",
-      icon: <AlertTriangle className="h-3.5 w-3.5" />,
-    },
-    empty: {
-      cls: "text-muted-foreground bg-muted",
-      icon: null,
-    },
-  }[res.estado];
+function TotalInvoiceCard({
+  value,
+  onChange,
+  onApply,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onApply: () => void;
+}) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium",
-        cfg.cls,
-      )}
-    >
-      {cfg.icon}
-      {res.observacion}
-    </span>
+    <div className="calc-card flex flex-col gap-2 px-4 py-3">
+      <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+        Precio Factura Total
+      </div>
+      <div className="flex gap-2">
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onApply();
+            }
+          }}
+          placeholder="Ej: 50000"
+          inputMode="decimal"
+          className="h-9 font-mono"
+        />
+        <Button onClick={onApply} size="sm" variant="secondary">
+          <Wand2 className="mr-1 h-4 w-4" />
+          Aplicar
+        </Button>
+      </div>
+      <div className="text-[11px] text-muted-foreground">
+        Distribuye el % proporcional para igualar el total.
+      </div>
+    </div>
   );
 }
