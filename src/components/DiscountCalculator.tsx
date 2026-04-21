@@ -431,18 +431,18 @@ export function DiscountCalculator(_: Props = {}) {
       </section>
 
       {/* Summary */}
-      <section className="flex flex-wrap items-stretch gap-3">
-        <SummaryCard label="Artículos" value={String(summary.articulos ?? 0)} compact />
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <SummaryCard label="Artículos" value={String(summary.articulos ?? 0)} />
         <SummaryCard
           label="Total Nota de Crédito"
           value={`$ ${fmtMoney(summary.totalNota)}`}
           highlight
-          className="flex-1 min-w-[220px]"
         />
-        <SummaryCard
-          label="Promedio desc. nuevo"
-          value={fmtPct(summary.avgDescNuevo)}
-          className="flex-1 min-w-[220px]"
+        <SummaryCard label="Promedio desc. nuevo" value={fmtPct(summary.avgDescNuevo)} />
+        <TotalInvoiceCard
+          value={bulkTotalPrice}
+          onChange={setBulkTotalPrice}
+          onApply={applyBulkTotalPrice}
         />
       </section>
 
