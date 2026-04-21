@@ -38,6 +38,7 @@ export function DiscountCalculator(_: Props = {}) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkPercent, setBulkPercent] = useState("");
   const [bulkPrice, setBulkPrice] = useState("");
+  const [bulkTotalPrice, setBulkTotalPrice] = useState("");
   const [globalHas105, setGlobalHas105] = useState(false);
 
   // Apply global has105 to every row at compute-time
