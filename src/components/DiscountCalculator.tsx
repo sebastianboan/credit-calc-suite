@@ -277,7 +277,7 @@ export function DiscountCalculator(_: Props = {}) {
             </div>
           </div>
 
-          {/* Acciones masivas - dos filas */}
+          {/* Acciones masivas - tres filas */}
           <div>
             <Label className="mb-3 block text-xs uppercase tracking-wider text-muted-foreground">
               Acciones masivas {selected.size > 0 ? `(${selected.size} fila/s)` : "(todas)"}
@@ -305,6 +305,20 @@ export function DiscountCalculator(_: Props = {}) {
                 <Button onClick={applyBulkPrice} variant="secondary">
                   <Wand2 className="mr-1.5 h-4 w-4" />
                   Aplicar precio
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={bulkTotalPrice}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setBulkTotalPrice(e.target.value)
+                  }
+                  placeholder="Precio factura total — Ej: 50000"
+                  inputMode="decimal"
+                />
+                <Button onClick={applyBulkTotalPrice} variant="secondary">
+                  <Wand2 className="mr-1.5 h-4 w-4" />
+                  Aplicar total
                 </Button>
               </div>
             </div>
