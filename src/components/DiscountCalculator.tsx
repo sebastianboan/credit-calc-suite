@@ -159,24 +159,28 @@ export function DiscountCalculator(_: Props = {}) {
     [],
   );
 
-  // Summary (sin alertas ni 10,5%)
+  // Summary: "Articulos" cuenta filas completadas (con código o precio factura)
   const summary = useMemo(() => {
-    let validRows = 0;
+    let articulos = 0;
+    let okRows = 0;
     let totalNota = 0;
     let sumDescNuevo = 0;
-    results.forEach((r) => {
-      if (r.estado === "ok") {
-        validRows++;
-        if (r.notaCredito != null) totalNota += r.notaCredito;
-        if (r.descuentoNuevoPct != null) sumDescNuevo += r.descuentoNuevoPct;
+    rows.forEach((r, i) => {
+      const filled = r.codigo.trim() !== "" || r.precioFactura.trim() !== "";
+      if (filled) articulos++;
+      const res = results[i];
+      if (res.estado === "ok") {
+        okRows++;
+        if (res.notaCredito != null) totalNota += res.notaCredito;
+        if (res.descuentoNuevoPct != null) sumDescNuevo += res.descuentoNuevoPct;
       }
     });
     return {
-      validRows,
+      articulos,
       totalNota,
-      avgDescNuevo: validRows > 0 ? sumDescNuevo / validRows : 0,
+      avgDescNuevo: okRows > 0 ? sumDescNuevo / okRows : 0,
     };
-  }, [results]);
+  }, [results, rows]);
 
   const exportData = () => {
     return rows.map((r, i) => {
