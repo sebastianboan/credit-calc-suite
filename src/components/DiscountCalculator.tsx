@@ -30,8 +30,6 @@ import {
   FileSpreadsheet,
   Calculator,
   Wand2,
-  AlertTriangle,
-  CheckCircle2,
 } from "lucide-react";
 
 const initialRows = (): Row[] => Array.from({ length: 10 }, () => newEmptyRow());
