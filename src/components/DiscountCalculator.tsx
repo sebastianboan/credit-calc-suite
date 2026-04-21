@@ -38,6 +38,7 @@ export function DiscountCalculator(_: Props = {}) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkPercent, setBulkPercent] = useState("");
   const [bulkPrice, setBulkPrice] = useState("");
+  const [bulkTotalPrice, setBulkTotalPrice] = useState("");
   const [globalHas105, setGlobalHas105] = useState(false);
 
   // Apply global has105 to every row at compute-time
@@ -97,6 +98,33 @@ export function DiscountCalculator(_: Props = {}) {
     );
   };
 
+  // Apply a global TOTAL invoice price across selected (or all) valid rows.
+  // Computes the uniform % discount needed so the sum of final prices equals the target total.
+  const applyBulkTotalPrice = () => {
+    const cleaned = bulkTotalPrice.replace(/\s/g, "").replace(",", ".");
+    const target = Number(cleaned);
+    if (!Number.isFinite(target) || target <= 0) return;
+
+    // Determine eligible rows (with valid precioFactura)
+    const eligibleIds = new Set<string>();
+    let sumBase = 0;
+    rows.forEach((r) => {
+      if (selected.size > 0 && !selected.has(r.id)) return;
+      const base = Number(String(r.precioFactura).replace(/\s/g, "").replace(",", "."));
+      if (Number.isFinite(base) && base > 0) {
+        eligibleIds.add(r.id);
+        sumBase += base;
+      }
+    });
+    if (sumBase <= 0 || target > sumBase) return;
+    const pct = (1 - target / sumBase) * 100;
+    const pctStr = pct.toFixed(2);
+    setMode("percent");
+    setRows((rs) =>
+      rs.map((r) => (eligibleIds.has(r.id) ? { ...r, targetPercent: pctStr } : r)),
+    );
+  };
+
   // Excel-like paste handler on the first cell of a row
   const handlePaste = useCallback(
     (rowIndex: number, colIndex: number) => (e: ClipboardEvent<HTMLInputElement>) => {
@@ -131,24 +159,28 @@ export function DiscountCalculator(_: Props = {}) {
     [],
   );
 
-  // Summary (sin alertas ni 10,5%)
+  // Summary: "Articulos" cuenta filas completadas (con código o precio factura)
   const summary = useMemo(() => {
-    let validRows = 0;
+    let articulos = 0;
+    let okRows = 0;
     let totalNota = 0;
     let sumDescNuevo = 0;
-    results.forEach((r) => {
-      if (r.estado === "ok") {
-        validRows++;
-        if (r.notaCredito != null) totalNota += r.notaCredito;
-        if (r.descuentoNuevoPct != null) sumDescNuevo += r.descuentoNuevoPct;
+    rows.forEach((r, i) => {
+      const filled = r.codigo.trim() !== "" || r.precioFactura.trim() !== "";
+      if (filled) articulos++;
+      const res = results[i];
+      if (res.estado === "ok") {
+        okRows++;
+        if (res.notaCredito != null) totalNota += res.notaCredito;
+        if (res.descuentoNuevoPct != null) sumDescNuevo += res.descuentoNuevoPct;
       }
     });
     return {
-      validRows,
+      articulos,
       totalNota,
-      avgDescNuevo: validRows > 0 ? sumDescNuevo / validRows : 0,
+      avgDescNuevo: okRows > 0 ? sumDescNuevo / okRows : 0,
     };
-  }, [results]);
+  }, [results, rows]);
 
   const exportData = () => {
     return rows.map((r, i) => {
@@ -245,7 +277,7 @@ export function DiscountCalculator(_: Props = {}) {
             </div>
           </div>
 
-          {/* Acciones masivas - dos filas */}
+          {/* Acciones masivas - tres filas */}
           <div>
             <Label className="mb-3 block text-xs uppercase tracking-wider text-muted-foreground">
               Acciones masivas {selected.size > 0 ? `(${selected.size} fila/s)` : "(todas)"}
@@ -273,6 +305,20 @@ export function DiscountCalculator(_: Props = {}) {
                 <Button onClick={applyBulkPrice} variant="secondary">
                   <Wand2 className="mr-1.5 h-4 w-4" />
                   Aplicar precio
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={bulkTotalPrice}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setBulkTotalPrice(e.target.value)
+                  }
+                  placeholder="Precio factura total — Ej: 50000"
+                  inputMode="decimal"
+                />
+                <Button onClick={applyBulkTotalPrice} variant="secondary">
+                  <Wand2 className="mr-1.5 h-4 w-4" />
+                  Aplicar total
                 </Button>
               </div>
             </div>
@@ -305,31 +351,32 @@ export function DiscountCalculator(_: Props = {}) {
         </div>
 
         {/* Acciones secundarias */}
-        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-          <Button onClick={addRow} variant="outline" size="sm">
-            <Plus className="mr-1.5 h-4 w-4" />
-            Fila
+        <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-border pt-4">
+          <Button onClick={addRow} variant="outline" size="lg" className="text-base">
+            <Plus className="mr-2 h-5 w-5" />
+            Agregar fila
           </Button>
           <Button
             onClick={deleteSelected}
             variant="outline"
-            size="sm"
+            size="lg"
+            className="text-base"
             disabled={selected.size === 0}
           >
-            <Trash2 className="mr-1.5 h-4 w-4" />
-            Borrar sel.
+            <Trash2 className="mr-2 h-5 w-5" />
+            Borrar selección
           </Button>
-          <Button onClick={clearAll} variant="outline" size="sm">
-            <Eraser className="mr-1.5 h-4 w-4" />
-            Limpiar
+          <Button onClick={clearAll} variant="outline" size="lg" className="text-base">
+            <Eraser className="mr-2 h-5 w-5" />
+            Limpiar todo
           </Button>
-          <div className="ml-auto flex gap-2">
-            <Button onClick={exportXlsx} size="sm">
-              <FileSpreadsheet className="mr-1.5 h-4 w-4" />
+          <div className="ml-auto flex gap-3">
+            <Button onClick={exportXlsx} size="lg" className="text-base">
+              <FileSpreadsheet className="mr-2 h-5 w-5" />
               Excel
             </Button>
-            <Button onClick={exportCsv} size="sm" variant="secondary">
-              <Download className="mr-1.5 h-4 w-4" />
+            <Button onClick={exportCsv} size="lg" variant="secondary" className="text-base">
+              <Download className="mr-2 h-5 w-5" />
               CSV
             </Button>
           </div>
@@ -337,14 +384,19 @@ export function DiscountCalculator(_: Props = {}) {
       </section>
 
       {/* Summary */}
-      <section className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <SummaryCard label="Filas válidas" value={summary.validRows.toString()} />
+      <section className="flex flex-wrap items-stretch gap-3">
+        <SummaryCard label="Artículos" value={summary.articulos.toString()} compact />
         <SummaryCard
           label="Total Nota de Crédito"
           value={`$ ${fmtMoney(summary.totalNota)}`}
           highlight
+          className="flex-1 min-w-[220px]"
         />
-        <SummaryCard label="Promedio desc. nuevo" value={fmtPct(summary.avgDescNuevo)} />
+        <SummaryCard
+          label="Promedio desc. nuevo"
+          value={fmtPct(summary.avgDescNuevo)}
+          className="flex-1 min-w-[220px]"
+        />
       </section>
 
       {/* Table */}
@@ -372,7 +424,7 @@ export function DiscountCalculator(_: Props = {}) {
                   {mode === "price" ? "Precio final ✱" : "Precio final"}
                 </th>
                 <th className="px-3 py-3 text-right">Precio Final Objetivo</th>
-                <th className="px-3 py-3 text-right">% Desc. Total</th>
+                
                 <th className="px-3 py-3 text-right">% Desc. Nuevo</th>
                 <th className="px-3 py-3 text-right">Nota Crédito</th>
                 <th className="px-3 py-3 text-left">Observación</th>
@@ -503,17 +555,23 @@ function SummaryCard({
   label,
   value,
   highlight,
+  compact,
+  className,
 }: {
   label: string;
   value: string;
   highlight?: boolean;
+  compact?: boolean;
+  className?: string;
 }) {
   return (
     <div
       className={cn(
         "calc-card px-4 py-3",
+        compact && "min-w-[140px]",
         highlight &&
           "bg-gradient-to-br from-primary to-[oklch(0.4_0.1_220)] text-primary-foreground",
+        className,
       )}
     >
       <div
@@ -535,7 +593,6 @@ function ResultCells({ res }: { res: RowResult }) {
       <td className="result-cell result-cell-strong text-right text-base">
         {res.precioFinalObjetivo != null ? `$${fmtMoney(res.precioFinalObjetivo)}` : "—"}
       </td>
-      <td className="result-cell text-right text-base">{fmtPct(res.descuentoTotalPct)}</td>
       <td className="result-cell result-cell-strong text-right text-base">
         {res.descuentoNuevoPct != null ? fmtPct(res.descuentoNuevoPct) : "—"}
       </td>
