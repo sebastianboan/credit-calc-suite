@@ -1,4 +1,12 @@
-import { useMemo, useState, useCallback, type ChangeEvent, type ClipboardEvent } from "react";
+import {
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+  type ChangeEvent,
+  type ClipboardEvent,
+  type KeyboardEvent,
+} from "react";
 import * as XLSX from "xlsx";
 import {
   computeRow,
@@ -40,6 +48,22 @@ export function DiscountCalculator(_: Props = {}) {
   const [bulkPrice, setBulkPrice] = useState("");
   const [bulkTotalPrice, setBulkTotalPrice] = useState("");
   const [globalHas105, setGlobalHas105] = useState(false);
+
+  // Refs for Excel-like keyboard navigation.
+  // Editable input columns: 0 = codigo, 1 = precioFactura, 2 = oferta
+  // Read-only result column for copy-only focus: 3 = % desc nuevo
+  const cellRefs = useRef<Record<string, HTMLElement | null>>({});
+  const cellKey = (r: number, c: number) => `${r}:${c}`;
+  const setCellRef = (r: number, c: number) => (el: HTMLElement | null) => {
+    cellRefs.current[cellKey(r, c)] = el;
+  };
+  const focusCell = (r: number, c: number) => {
+    const el = cellRefs.current[cellKey(r, c)];
+    if (el) {
+      el.focus();
+      if (el instanceof HTMLInputElement) el.select();
+    }
+  };
 
   // Apply global has105 to every row at compute-time
   const results = useMemo(
@@ -159,6 +183,45 @@ export function DiscountCalculator(_: Props = {}) {
     [],
   );
 
+  // Excel-like keyboard navigation across cells.
+  // Columns: 0 = codigo, 1 = precioFactura, 2 = oferta, 3 = % desc nuevo (read-only)
+  const TOTAL_COLS = 4;
+  const handleCellKeyDown =
+    (rowIndex: number, colIndex: number) => (e: KeyboardEvent<HTMLElement>) => {
+      const totalRows = rows.length;
+      const move = (dr: number, dc: number) => {
+        let r = rowIndex + dr;
+        let c = colIndex + dc;
+        if (c < 0) {
+          c = TOTAL_COLS - 1;
+          r -= 1;
+        } else if (c >= TOTAL_COLS) {
+          c = 0;
+          r += 1;
+        }
+        if (r < 0 || r >= totalRows) return;
+        e.preventDefault();
+        focusCell(r, c);
+      };
+      if (e.key === "Tab") {
+        move(0, e.shiftKey ? -1 : 1);
+      } else if (e.key === "Enter") {
+        move(e.shiftKey ? -1 : 1, 0);
+      } else if (e.key === "ArrowDown") {
+        move(1, 0);
+      } else if (e.key === "ArrowUp") {
+        move(-1, 0);
+      } else if (e.key === "ArrowLeft") {
+        const el = e.currentTarget;
+        if (el instanceof HTMLInputElement && el.selectionStart !== 0) return;
+        move(0, -1);
+      } else if (e.key === "ArrowRight") {
+        const el = e.currentTarget;
+        if (el instanceof HTMLInputElement && el.selectionEnd !== el.value.length) return;
+        move(0, 1);
+      }
+    };
+
   // Summary: "Articulos" cuenta filas completadas (con código o precio factura)
   const summary = useMemo(() => {
     let articulos = 0;
@@ -229,7 +292,7 @@ export function DiscountCalculator(_: Props = {}) {
       {/* Header */}
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground shadow-sm">
             <Calculator className="h-5 w-5" />
           </div>
           <div>
@@ -412,9 +475,9 @@ export function DiscountCalculator(_: Props = {}) {
                   />
                 </th>
                 <th className="w-10 px-2 py-3 text-center">#</th>
-                <th className="px-3 py-3 text-left">Código</th>
-                <th className="px-3 py-3 text-right">Precio Factura</th>
-                <th className="px-3 py-3 text-right">Oferta %</th>
+                <th className="col-input-bg px-3 py-3 text-left">Código</th>
+                <th className="col-input-bg px-3 py-3 text-right">Precio Factura</th>
+                <th className="col-input-bg px-3 py-3 text-right">Oferta %</th>
                 <th className="px-3 py-3 text-right">
                   {mode === "percent" ? "% final ✱" : "% final"}
                 </th>
@@ -422,8 +485,7 @@ export function DiscountCalculator(_: Props = {}) {
                   {mode === "price" ? "Precio final ✱" : "Precio final"}
                 </th>
                 <th className="px-3 py-3 text-right">Precio Final Objetivo</th>
-                
-                <th className="px-3 py-3 text-right">% Desc. Nuevo</th>
+                <th className="col-result-bg px-3 py-3 text-right">% Desc. Nuevo</th>
                 <th className="px-3 py-3 text-right">Nota Crédito</th>
                 <th className="px-3 py-3 text-left">Observación</th>
                 <th className="w-10 px-2 py-3"></th>
@@ -452,17 +514,20 @@ export function DiscountCalculator(_: Props = {}) {
                       />
                     </td>
                     <td className="px-2 text-center text-xs text-muted-foreground">{i + 1}</td>
-                    <td className="px-1 py-1">
+                    <td className="col-input-bg px-1 py-1">
                       <input
+                        ref={setCellRef(i, 0)}
                         className="cell-input h-10 text-base"
                         value={row.codigo}
                         onChange={(e) => updateRow(row.id, { codigo: e.target.value })}
                         onPaste={handlePaste(i, 0)}
+                        onKeyDown={handleCellKeyDown(i, 0)}
                         placeholder="—"
                       />
                     </td>
-                    <td className="px-1 py-1">
+                    <td className="col-input-bg px-1 py-1">
                       <input
+                        ref={setCellRef(i, 1)}
                         className="cell-input h-10 text-right font-mono text-base"
                         value={row.precioFactura}
                         onChange={(e) =>
@@ -471,18 +536,21 @@ export function DiscountCalculator(_: Props = {}) {
                           })
                         }
                         onPaste={handlePaste(i, 1)}
+                        onKeyDown={handleCellKeyDown(i, 1)}
                         inputMode="decimal"
                         placeholder="0,00"
                       />
                     </td>
-                    <td className="px-1 py-1">
+                    <td className="col-input-bg px-1 py-1">
                       <input
+                        ref={setCellRef(i, 2)}
                         className="cell-input h-10 text-right font-mono text-base"
                         value={row.oferta}
                         onChange={(e) =>
                           updateRow(row.id, { oferta: e.target.value.replace(/[^\d.,-]/g, "") })
                         }
                         onPaste={handlePaste(i, 2)}
+                        onKeyDown={handleCellKeyDown(i, 2)}
                         inputMode="decimal"
                         placeholder="0"
                       />
@@ -521,7 +589,11 @@ export function DiscountCalculator(_: Props = {}) {
                         placeholder={mode === "price" ? "0,00" : "—"}
                       />
                     </td>
-                    <ResultCells res={res} />
+                    <ResultCells
+                      res={res}
+                      descNuevoRef={setCellRef(i, 3)}
+                      onDescNuevoKeyDown={handleCellKeyDown(i, 3)}
+                    />
                     <td className="px-2">
                       <ObservationCell res={res} />
                     </td>
@@ -585,14 +657,41 @@ function SummaryCard({
   );
 }
 
-function ResultCells({ res }: { res: RowResult }) {
+function ResultCells({
+  res,
+  descNuevoRef,
+  onDescNuevoKeyDown,
+}: {
+  res: RowResult;
+  descNuevoRef?: (el: HTMLElement | null) => void;
+  onDescNuevoKeyDown?: (e: KeyboardEvent<HTMLElement>) => void;
+}) {
+  const descText = res.descuentoNuevoPct != null ? fmtPct(res.descuentoNuevoPct) : "—";
   return (
     <>
       <td className="result-cell result-cell-strong text-right text-base">
         {res.precioFinalObjetivo != null ? `$${fmtMoney(res.precioFinalObjetivo)}` : "—"}
       </td>
-      <td className="result-cell result-cell-strong text-right text-base">
-        {res.descuentoNuevoPct != null ? fmtPct(res.descuentoNuevoPct) : "—"}
+      <td className="col-result-bg p-0">
+        {/* Read-only but focusable cell: navigable & copyable, not editable */}
+        <div
+          ref={descNuevoRef as (el: HTMLDivElement | null) => void}
+          tabIndex={0}
+          role="textbox"
+          aria-readonly="true"
+          onKeyDown={onDescNuevoKeyDown}
+          onFocus={(e) => {
+            const range = document.createRange();
+            range.selectNodeContents(e.currentTarget);
+            const sel = window.getSelection();
+            sel?.removeAllRanges();
+            sel?.addRange(range);
+          }}
+          className="result-copy-cell"
+          title="Solo lectura — usá Ctrl+C para copiar"
+        >
+          {descText}
+        </div>
       </td>
       <td className="result-cell text-right text-base">
         {res.notaCredito != null ? `$${fmtMoney(res.notaCredito)}` : "—"}
