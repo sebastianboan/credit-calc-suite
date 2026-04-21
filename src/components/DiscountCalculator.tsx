@@ -292,7 +292,7 @@ export function DiscountCalculator(_: Props = {}) {
       {/* Header */}
       <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground shadow-sm">
             <Calculator className="h-5 w-5" />
           </div>
           <div>
