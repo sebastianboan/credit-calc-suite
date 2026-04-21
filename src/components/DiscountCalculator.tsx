@@ -590,7 +590,11 @@ export function DiscountCalculator(_: Props = {}) {
                         placeholder={mode === "price" ? "0,00" : "—"}
                       />
                     </td>
-                    <ResultCells res={res} />
+                    <ResultCells
+                      res={res}
+                      descNuevoRef={setCellRef(i, 3)}
+                      onDescNuevoKeyDown={handleCellKeyDown(i, 3)}
+                    />
                     <td className="px-2">
                       <ObservationCell res={res} />
                     </td>
