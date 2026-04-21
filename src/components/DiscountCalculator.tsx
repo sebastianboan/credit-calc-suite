@@ -351,31 +351,32 @@ export function DiscountCalculator(_: Props = {}) {
         </div>
 
         {/* Acciones secundarias */}
-        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-4">
-          <Button onClick={addRow} variant="outline" size="sm">
-            <Plus className="mr-1.5 h-4 w-4" />
-            Fila
+        <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-border pt-4">
+          <Button onClick={addRow} variant="outline" size="lg" className="text-base">
+            <Plus className="mr-2 h-5 w-5" />
+            Agregar fila
           </Button>
           <Button
             onClick={deleteSelected}
             variant="outline"
-            size="sm"
+            size="lg"
+            className="text-base"
             disabled={selected.size === 0}
           >
-            <Trash2 className="mr-1.5 h-4 w-4" />
-            Borrar sel.
+            <Trash2 className="mr-2 h-5 w-5" />
+            Borrar selección
           </Button>
-          <Button onClick={clearAll} variant="outline" size="sm">
-            <Eraser className="mr-1.5 h-4 w-4" />
-            Limpiar
+          <Button onClick={clearAll} variant="outline" size="lg" className="text-base">
+            <Eraser className="mr-2 h-5 w-5" />
+            Limpiar todo
           </Button>
-          <div className="ml-auto flex gap-2">
-            <Button onClick={exportXlsx} size="sm">
-              <FileSpreadsheet className="mr-1.5 h-4 w-4" />
+          <div className="ml-auto flex gap-3">
+            <Button onClick={exportXlsx} size="lg" className="text-base">
+              <FileSpreadsheet className="mr-2 h-5 w-5" />
               Excel
             </Button>
-            <Button onClick={exportCsv} size="sm" variant="secondary">
-              <Download className="mr-1.5 h-4 w-4" />
+            <Button onClick={exportCsv} size="lg" variant="secondary" className="text-base">
+              <Download className="mr-2 h-5 w-5" />
               CSV
             </Button>
           </div>
@@ -383,14 +384,19 @@ export function DiscountCalculator(_: Props = {}) {
       </section>
 
       {/* Summary */}
-      <section className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <SummaryCard label="Filas válidas" value={summary.validRows.toString()} />
+      <section className="flex flex-wrap items-stretch gap-3">
+        <SummaryCard label="Artículos" value={summary.articulos.toString()} compact />
         <SummaryCard
           label="Total Nota de Crédito"
           value={`$ ${fmtMoney(summary.totalNota)}`}
           highlight
+          className="flex-1 min-w-[220px]"
         />
-        <SummaryCard label="Promedio desc. nuevo" value={fmtPct(summary.avgDescNuevo)} />
+        <SummaryCard
+          label="Promedio desc. nuevo"
+          value={fmtPct(summary.avgDescNuevo)}
+          className="flex-1 min-w-[220px]"
+        />
       </section>
 
       {/* Table */}
