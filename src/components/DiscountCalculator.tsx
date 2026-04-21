@@ -383,7 +383,7 @@ export function DiscountCalculator(_: Props = {}) {
 
       {/* Summary */}
       <section className="flex flex-wrap items-stretch gap-3">
-        <SummaryCard label="Artículos" value={summary.articulos.toString()} compact />
+        <SummaryCard label="Artículos" value={String(summary.articulos ?? 0)} compact />
         <SummaryCard
           label="Total Nota de Crédito"
           value={`$ ${fmtMoney(summary.totalNota)}`}
