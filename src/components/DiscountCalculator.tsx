@@ -30,8 +30,6 @@ import {
   FileSpreadsheet,
   Calculator,
   Wand2,
-  AlertTriangle,
-  CheckCircle2,
 } from "lucide-react";
 
 const initialRows = (): Row[] => Array.from({ length: 10 }, () => newEmptyRow());
@@ -340,7 +338,7 @@ export function DiscountCalculator(_: Props = {}) {
             </div>
           </div>
 
-          {/* Acciones masivas - tres filas */}
+          {/* Acciones masivas - dos filas */}
           <div>
             <Label className="mb-3 block text-xs uppercase tracking-wider text-muted-foreground">
               Acciones masivas {selected.size > 0 ? `(${selected.size} fila/s)` : "(todas)"}
@@ -368,20 +366,6 @@ export function DiscountCalculator(_: Props = {}) {
                 <Button onClick={applyBulkPrice} variant="secondary">
                   <Wand2 className="mr-1.5 h-4 w-4" />
                   Aplicar precio
-                </Button>
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={bulkTotalPrice}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setBulkTotalPrice(e.target.value)
-                  }
-                  placeholder="Precio factura total — Ej: 50000"
-                  inputMode="decimal"
-                />
-                <Button onClick={applyBulkTotalPrice} variant="secondary">
-                  <Wand2 className="mr-1.5 h-4 w-4" />
-                  Aplicar total
                 </Button>
               </div>
             </div>
@@ -445,18 +429,18 @@ export function DiscountCalculator(_: Props = {}) {
       </section>
 
       {/* Summary */}
-      <section className="flex flex-wrap items-stretch gap-3">
-        <SummaryCard label="Artículos" value={String(summary.articulos ?? 0)} compact />
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <SummaryCard label="Artículos" value={String(summary.articulos ?? 0)} />
         <SummaryCard
           label="Total Nota de Crédito"
           value={`$ ${fmtMoney(summary.totalNota)}`}
           highlight
-          className="flex-1 min-w-[220px]"
         />
-        <SummaryCard
-          label="Promedio desc. nuevo"
-          value={fmtPct(summary.avgDescNuevo)}
-          className="flex-1 min-w-[220px]"
+        <SummaryCard label="Promedio desc. nuevo" value={fmtPct(summary.avgDescNuevo)} />
+        <TotalInvoiceCard
+          value={bulkTotalPrice}
+          onChange={setBulkTotalPrice}
+          onApply={applyBulkTotalPrice}
         />
       </section>
 
@@ -487,7 +471,6 @@ export function DiscountCalculator(_: Props = {}) {
                 <th className="px-3 py-3 text-right">Precio Final Objetivo</th>
                 <th className="col-result-bg px-3 py-3 text-right">% Desc. Nuevo</th>
                 <th className="px-3 py-3 text-right">Nota Crédito</th>
-                <th className="px-3 py-3 text-left">Observación</th>
                 <th className="w-10 px-2 py-3"></th>
               </tr>
             </thead>
@@ -594,9 +577,6 @@ export function DiscountCalculator(_: Props = {}) {
                       descNuevoRef={setCellRef(i, 3)}
                       onDescNuevoKeyDown={handleCellKeyDown(i, 3)}
                     />
-                    <td className="px-2">
-                      <ObservationCell res={res} />
-                    </td>
                     <td className="px-2 text-center">
                       <button
                         onClick={() => deleteRow(row.id)}
@@ -700,36 +680,42 @@ function ResultCells({
   );
 }
 
-function ObservationCell({ res }: { res: RowResult }) {
-  if (res.estado === "empty" && !res.observacion)
-    return <span className="text-xs text-muted-foreground">—</span>;
-  const cfg = {
-    ok: {
-      cls: "text-[oklch(0.45_0.12_155)] bg-[oklch(0.95_0.05_155)]",
-      icon: <CheckCircle2 className="h-3.5 w-3.5" />,
-    },
-    warning: {
-      cls: "text-[oklch(0.45_0.14_60)] bg-[oklch(0.96_0.07_75)]",
-      icon: <AlertTriangle className="h-3.5 w-3.5" />,
-    },
-    error: {
-      cls: "text-destructive bg-destructive/10",
-      icon: <AlertTriangle className="h-3.5 w-3.5" />,
-    },
-    empty: {
-      cls: "text-muted-foreground bg-muted",
-      icon: null,
-    },
-  }[res.estado];
+function TotalInvoiceCard({
+  value,
+  onChange,
+  onApply,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onApply: () => void;
+}) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium",
-        cfg.cls,
-      )}
-    >
-      {cfg.icon}
-      {res.observacion}
-    </span>
+    <div className="calc-card flex flex-col gap-2 px-4 py-3">
+      <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+        Precio Factura Total
+      </div>
+      <div className="flex gap-2">
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              onApply();
+            }
+          }}
+          placeholder="Ej: 50000"
+          inputMode="decimal"
+          className="h-9 font-mono"
+        />
+        <Button onClick={onApply} size="sm" variant="secondary">
+          <Wand2 className="mr-1 h-4 w-4" />
+          Aplicar
+        </Button>
+      </div>
+      <div className="text-[11px] text-muted-foreground">
+        Distribuye el % proporcional para igualar el total.
+      </div>
+    </div>
   );
 }
