@@ -475,9 +475,9 @@ export function DiscountCalculator(_: Props = {}) {
                   />
                 </th>
                 <th className="w-10 px-2 py-3 text-center">#</th>
-                <th className="px-3 py-3 text-left">Código</th>
-                <th className="px-3 py-3 text-right">Precio Factura</th>
-                <th className="px-3 py-3 text-right">Oferta %</th>
+                <th className="col-input-bg px-3 py-3 text-left">Código</th>
+                <th className="col-input-bg px-3 py-3 text-right">Precio Factura</th>
+                <th className="col-input-bg px-3 py-3 text-right">Oferta %</th>
                 <th className="px-3 py-3 text-right">
                   {mode === "percent" ? "% final ✱" : "% final"}
                 </th>
@@ -485,8 +485,7 @@ export function DiscountCalculator(_: Props = {}) {
                   {mode === "price" ? "Precio final ✱" : "Precio final"}
                 </th>
                 <th className="px-3 py-3 text-right">Precio Final Objetivo</th>
-                
-                <th className="px-3 py-3 text-right">% Desc. Nuevo</th>
+                <th className="col-result-bg px-3 py-3 text-right">% Desc. Nuevo</th>
                 <th className="px-3 py-3 text-right">Nota Crédito</th>
                 <th className="px-3 py-3 text-left">Observación</th>
                 <th className="w-10 px-2 py-3"></th>
