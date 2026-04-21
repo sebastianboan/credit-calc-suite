@@ -329,11 +329,9 @@ export function DiscountCalculator(_: Props = {}) {
             <Label className="mb-3 block text-xs uppercase tracking-wider text-muted-foreground">
               Recargo global
             </Label>
-            <button
-              type="button"
-              onClick={() => setGlobalHas105((v) => !v)}
+            <label
               className={cn(
-                "flex items-center gap-3 rounded-xl border-2 px-5 py-3 text-left transition",
+                "flex cursor-pointer items-center gap-3 rounded-xl border-2 px-5 py-3 text-left transition",
                 globalHas105
                   ? "border-primary bg-primary/5"
                   : "border-border bg-muted/30 hover:bg-muted/60",
@@ -346,7 +344,7 @@ export function DiscountCalculator(_: Props = {}) {
                   {globalHas105 ? "Aplicado a todas las filas" : "Sin aplicar"}
                 </div>
               </div>
-            </button>
+            </label>
           </div>
         </div>
 
