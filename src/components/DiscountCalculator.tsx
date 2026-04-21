@@ -555,17 +555,23 @@ function SummaryCard({
   label,
   value,
   highlight,
+  compact,
+  className,
 }: {
   label: string;
   value: string;
   highlight?: boolean;
+  compact?: boolean;
+  className?: string;
 }) {
   return (
     <div
       className={cn(
         "calc-card px-4 py-3",
+        compact && "min-w-[140px]",
         highlight &&
           "bg-gradient-to-br from-primary to-[oklch(0.4_0.1_220)] text-primary-foreground",
+        className,
       )}
     >
       <div
