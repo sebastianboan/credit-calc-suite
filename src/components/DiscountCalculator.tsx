@@ -515,17 +515,20 @@ export function DiscountCalculator(_: Props = {}) {
                       />
                     </td>
                     <td className="px-2 text-center text-xs text-muted-foreground">{i + 1}</td>
-                    <td className="px-1 py-1">
+                    <td className="col-input-bg px-1 py-1">
                       <input
+                        ref={setCellRef(i, 0)}
                         className="cell-input h-10 text-base"
                         value={row.codigo}
                         onChange={(e) => updateRow(row.id, { codigo: e.target.value })}
                         onPaste={handlePaste(i, 0)}
+                        onKeyDown={handleCellKeyDown(i, 0)}
                         placeholder="—"
                       />
                     </td>
-                    <td className="px-1 py-1">
+                    <td className="col-input-bg px-1 py-1">
                       <input
+                        ref={setCellRef(i, 1)}
                         className="cell-input h-10 text-right font-mono text-base"
                         value={row.precioFactura}
                         onChange={(e) =>
@@ -534,18 +537,21 @@ export function DiscountCalculator(_: Props = {}) {
                           })
                         }
                         onPaste={handlePaste(i, 1)}
+                        onKeyDown={handleCellKeyDown(i, 1)}
                         inputMode="decimal"
                         placeholder="0,00"
                       />
                     </td>
-                    <td className="px-1 py-1">
+                    <td className="col-input-bg px-1 py-1">
                       <input
+                        ref={setCellRef(i, 2)}
                         className="cell-input h-10 text-right font-mono text-base"
                         value={row.oferta}
                         onChange={(e) =>
                           updateRow(row.id, { oferta: e.target.value.replace(/[^\d.,-]/g, "") })
                         }
                         onPaste={handlePaste(i, 2)}
+                        onKeyDown={handleCellKeyDown(i, 2)}
                         inputMode="decimal"
                         placeholder="0"
                       />
