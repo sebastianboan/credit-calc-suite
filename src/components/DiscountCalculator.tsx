@@ -49,6 +49,22 @@ export function DiscountCalculator(_: Props = {}) {
   const [bulkTotalPrice, setBulkTotalPrice] = useState("");
   const [globalHas105, setGlobalHas105] = useState(false);
 
+  // Refs for Excel-like keyboard navigation.
+  // Editable input columns: 0 = codigo, 1 = precioFactura, 2 = oferta
+  // Read-only result column for copy-only focus: 3 = % desc nuevo
+  const cellRefs = useRef<Record<string, HTMLElement | null>>({});
+  const cellKey = (r: number, c: number) => `${r}:${c}`;
+  const setCellRef = (r: number, c: number) => (el: HTMLElement | null) => {
+    cellRefs.current[cellKey(r, c)] = el;
+  };
+  const focusCell = (r: number, c: number) => {
+    const el = cellRefs.current[cellKey(r, c)];
+    if (el) {
+      el.focus();
+      if (el instanceof HTMLInputElement) el.select();
+    }
+  };
+
   // Apply global has105 to every row at compute-time
   const results = useMemo(
     () => rows.map((r) => computeRow({ ...r, has105: globalHas105 }, mode)),
