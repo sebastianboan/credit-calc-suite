@@ -658,14 +658,41 @@ function SummaryCard({
   );
 }
 
-function ResultCells({ res }: { res: RowResult }) {
+function ResultCells({
+  res,
+  descNuevoRef,
+  onDescNuevoKeyDown,
+}: {
+  res: RowResult;
+  descNuevoRef?: (el: HTMLElement | null) => void;
+  onDescNuevoKeyDown?: (e: KeyboardEvent<HTMLElement>) => void;
+}) {
+  const descText = res.descuentoNuevoPct != null ? fmtPct(res.descuentoNuevoPct) : "—";
   return (
     <>
       <td className="result-cell result-cell-strong text-right text-base">
         {res.precioFinalObjetivo != null ? `$${fmtMoney(res.precioFinalObjetivo)}` : "—"}
       </td>
-      <td className="result-cell result-cell-strong text-right text-base">
-        {res.descuentoNuevoPct != null ? fmtPct(res.descuentoNuevoPct) : "—"}
+      <td className="col-result-bg p-0">
+        {/* Read-only but focusable cell: navigable & copyable, not editable */}
+        <div
+          ref={descNuevoRef as (el: HTMLDivElement | null) => void}
+          tabIndex={0}
+          role="textbox"
+          aria-readonly="true"
+          onKeyDown={onDescNuevoKeyDown}
+          onFocus={(e) => {
+            const range = document.createRange();
+            range.selectNodeContents(e.currentTarget);
+            const sel = window.getSelection();
+            sel?.removeAllRanges();
+            sel?.addRange(range);
+          }}
+          className="result-copy-cell"
+          title="Solo lectura — usá Ctrl+C para copiar"
+        >
+          {descText}
+        </div>
       </td>
       <td className="result-cell text-right text-base">
         {res.notaCredito != null ? `$${fmtMoney(res.notaCredito)}` : "—"}
