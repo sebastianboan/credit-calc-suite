@@ -424,7 +424,7 @@ export function DiscountCalculator(_: Props = {}) {
                   {mode === "price" ? "Precio final ✱" : "Precio final"}
                 </th>
                 <th className="px-3 py-3 text-right">Precio Final Objetivo</th>
-                <th className="px-3 py-3 text-right">% Desc. Total</th>
+                
                 <th className="px-3 py-3 text-right">% Desc. Nuevo</th>
                 <th className="px-3 py-3 text-right">Nota Crédito</th>
                 <th className="px-3 py-3 text-left">Observación</th>
