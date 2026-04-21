@@ -593,7 +593,6 @@ function ResultCells({ res }: { res: RowResult }) {
       <td className="result-cell result-cell-strong text-right text-base">
         {res.precioFinalObjetivo != null ? `$${fmtMoney(res.precioFinalObjetivo)}` : "—"}
       </td>
-      <td className="result-cell text-right text-base">{fmtPct(res.descuentoTotalPct)}</td>
       <td className="result-cell result-cell-strong text-right text-base">
         {res.descuentoNuevoPct != null ? fmtPct(res.descuentoNuevoPct) : "—"}
       </td>
