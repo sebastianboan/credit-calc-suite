@@ -473,7 +473,6 @@ export function DiscountCalculator(_: Props = {}) {
                 <th className="px-3 py-3 text-right">Precio Final Objetivo</th>
                 <th className="col-result-bg px-3 py-3 text-right">% Desc. Nuevo</th>
                 <th className="px-3 py-3 text-right">Nota Crédito</th>
-                <th className="px-3 py-3 text-left">Observación</th>
                 <th className="w-10 px-2 py-3"></th>
               </tr>
             </thead>
