@@ -98,6 +98,33 @@ export function DiscountCalculator(_: Props = {}) {
     );
   };
 
+  // Apply a global TOTAL invoice price across selected (or all) valid rows.
+  // Computes the uniform % discount needed so the sum of final prices equals the target total.
+  const applyBulkTotalPrice = () => {
+    const cleaned = bulkTotalPrice.replace(/\s/g, "").replace(",", ".");
+    const target = Number(cleaned);
+    if (!Number.isFinite(target) || target <= 0) return;
+
+    // Determine eligible rows (with valid precioFactura)
+    const eligibleIds = new Set<string>();
+    let sumBase = 0;
+    rows.forEach((r) => {
+      if (selected.size > 0 && !selected.has(r.id)) return;
+      const base = Number(String(r.precioFactura).replace(/\s/g, "").replace(",", "."));
+      if (Number.isFinite(base) && base > 0) {
+        eligibleIds.add(r.id);
+        sumBase += base;
+      }
+    });
+    if (sumBase <= 0 || target > sumBase) return;
+    const pct = (1 - target / sumBase) * 100;
+    const pctStr = pct.toFixed(2);
+    setMode("percent");
+    setRows((rs) =>
+      rs.map((r) => (eligibleIds.has(r.id) ? { ...r, targetPercent: pctStr } : r)),
+    );
+  };
+
   // Excel-like paste handler on the first cell of a row
   const handlePaste = useCallback(
     (rowIndex: number, colIndex: number) => (e: ClipboardEvent<HTMLInputElement>) => {
