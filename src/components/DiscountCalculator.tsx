@@ -183,6 +183,45 @@ export function DiscountCalculator(_: Props = {}) {
     [],
   );
 
+  // Excel-like keyboard navigation across cells.
+  // Columns: 0 = codigo, 1 = precioFactura, 2 = oferta, 3 = % desc nuevo (read-only)
+  const TOTAL_COLS = 4;
+  const handleCellKeyDown =
+    (rowIndex: number, colIndex: number) => (e: KeyboardEvent<HTMLElement>) => {
+      const totalRows = rows.length;
+      const move = (dr: number, dc: number) => {
+        let r = rowIndex + dr;
+        let c = colIndex + dc;
+        if (c < 0) {
+          c = TOTAL_COLS - 1;
+          r -= 1;
+        } else if (c >= TOTAL_COLS) {
+          c = 0;
+          r += 1;
+        }
+        if (r < 0 || r >= totalRows) return;
+        e.preventDefault();
+        focusCell(r, c);
+      };
+      if (e.key === "Tab") {
+        move(0, e.shiftKey ? -1 : 1);
+      } else if (e.key === "Enter") {
+        move(e.shiftKey ? -1 : 1, 0);
+      } else if (e.key === "ArrowDown") {
+        move(1, 0);
+      } else if (e.key === "ArrowUp") {
+        move(-1, 0);
+      } else if (e.key === "ArrowLeft") {
+        const el = e.currentTarget;
+        if (el instanceof HTMLInputElement && el.selectionStart !== 0) return;
+        move(0, -1);
+      } else if (e.key === "ArrowRight") {
+        const el = e.currentTarget;
+        if (el instanceof HTMLInputElement && el.selectionEnd !== el.value.length) return;
+        move(0, 1);
+      }
+    };
+
   // Summary: "Articulos" cuenta filas completadas (con código o precio factura)
   const summary = useMemo(() => {
     let articulos = 0;
