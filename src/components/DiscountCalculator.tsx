@@ -592,8 +592,8 @@ export function DiscountCalculator(_: Props = {}) {
                     </td>
                     <ResultCells
                       res={res}
-                      descNuevoRef={setCellRef(i, 3)}
-                      onDescNuevoKeyDown={handleCellKeyDown(i, 3)}
+                      descNuevoRef={setCellRef(i, 4)}
+                      onDescNuevoKeyDown={handleCellKeyDown(i, 4)}
                     />
                     <td className="px-2 text-center">
                       <button
