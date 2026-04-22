@@ -359,10 +359,10 @@ export function DiscountCalculator(_: Props = {}) {
             </div>
           </div>
 
-          {/* Global 10,5% switch */}
+          {/* Global "Restar 10,5%" switch */}
           <div className="flex flex-col">
             <Label className="mb-3 block text-xs uppercase tracking-wider text-muted-foreground">
-              Recargo global
+              Restar 10,5%
             </Label>
             <label
               className={cn(
@@ -373,12 +373,7 @@ export function DiscountCalculator(_: Props = {}) {
               )}
             >
               <Switch checked={globalHas105} onCheckedChange={setGlobalHas105} />
-              <div>
-                <div className="text-base font-semibold leading-tight">10,5%</div>
-                <div className="text-xs text-muted-foreground">
-                  {globalHas105 ? "Aplicado a todas las filas" : "Sin aplicar"}
-                </div>
-              </div>
+              <div className="text-base font-semibold leading-tight">10,5%</div>
             </label>
           </div>
         </div>
