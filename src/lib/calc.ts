@@ -173,6 +173,7 @@ export const newEmptyRow = (): Row => ({
   codigo: "",
   precioFactura: "",
   oferta: "",
+  cantidad: "",
   has105: false,
   targetPercent: "",
   targetPrice: "",
