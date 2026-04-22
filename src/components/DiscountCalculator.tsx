@@ -173,6 +173,7 @@ export function DiscountCalculator(_: Props = {}) {
             if (ci === 0) patch.codigo = val;
             else if (ci === 1) patch.precioFactura = val.replace(/[^\d.,-]/g, "");
             else if (ci === 2) patch.oferta = val.replace(/[^\d.,-]/g, "");
+            else if (ci === 3) patch.cantidad = val.replace(/[^\d.,-]/g, "");
           }
           next[rowIndex + i] = { ...target, ...patch };
         }
@@ -183,8 +184,8 @@ export function DiscountCalculator(_: Props = {}) {
   );
 
   // Excel-like keyboard navigation across cells.
-  // Columns: 0 = codigo, 1 = precioFactura, 2 = oferta, 3 = % desc nuevo (read-only)
-  const TOTAL_COLS = 4;
+  // Columns: 0 = codigo, 1 = precioFactura, 2 = oferta, 3 = cantidad, 4 = % desc nuevo (read-only)
+  const TOTAL_COLS = 5;
   const handleCellKeyDown =
     (rowIndex: number, colIndex: number) => (e: KeyboardEvent<HTMLElement>) => {
       const totalRows = rows.length;
