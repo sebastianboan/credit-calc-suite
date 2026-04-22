@@ -171,7 +171,7 @@ export function DiscountCalculator(_: Props = {}) {
             const val = cells[j].trim();
             if (ci === 0) patch.codigo = val;
             else if (ci === 1) patch.precioFactura = val.replace(/[^\d.,-]/g, "");
-            else if (ci === 2) patch.oferta = val.replace(/[^\d.,-]/g, "") || "0";
+            else if (ci === 2) patch.oferta = val.replace(/[^\d.,-]/g, "");
           }
           next[rowIndex + i] = { ...target, ...patch };
         }
