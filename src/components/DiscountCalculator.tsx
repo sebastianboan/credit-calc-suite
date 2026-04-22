@@ -126,15 +126,17 @@ export function DiscountCalculator(_: Props = {}) {
     const target = Number(cleaned);
     if (!Number.isFinite(target) || target <= 0) return;
 
-    // Determine eligible rows (with valid precioFactura)
+    // Determine eligible rows (with valid precioFactura). Compute per-row TOTAL = precio * cantidad
     const eligibleIds = new Set<string>();
     let sumBase = 0;
     rows.forEach((r) => {
       if (selected.size > 0 && !selected.has(r.id)) return;
       const base = Number(String(r.precioFactura).replace(/\s/g, "").replace(",", "."));
+      const qtyRaw = Number(String(r.cantidad).replace(/\s/g, "").replace(",", "."));
+      const qty = Number.isFinite(qtyRaw) && qtyRaw > 0 ? qtyRaw : 1;
       if (Number.isFinite(base) && base > 0) {
         eligibleIds.add(r.id);
-        sumBase += base;
+        sumBase += base * qty;
       }
     });
     if (sumBase <= 0 || target > sumBase) return;
@@ -171,6 +173,7 @@ export function DiscountCalculator(_: Props = {}) {
             if (ci === 0) patch.codigo = val;
             else if (ci === 1) patch.precioFactura = val.replace(/[^\d.,-]/g, "");
             else if (ci === 2) patch.oferta = val.replace(/[^\d.,-]/g, "");
+            else if (ci === 3) patch.cantidad = val.replace(/[^\d.,-]/g, "");
           }
           next[rowIndex + i] = { ...target, ...patch };
         }
@@ -181,8 +184,8 @@ export function DiscountCalculator(_: Props = {}) {
   );
 
   // Excel-like keyboard navigation across cells.
-  // Columns: 0 = codigo, 1 = precioFactura, 2 = oferta, 3 = % desc nuevo (read-only)
-  const TOTAL_COLS = 4;
+  // Columns: 0 = codigo, 1 = precioFactura, 2 = oferta, 3 = cantidad, 4 = % desc nuevo (read-only)
+  const TOTAL_COLS = 5;
   const handleCellKeyDown =
     (rowIndex: number, colIndex: number) => (e: KeyboardEvent<HTMLElement>) => {
       const totalRows = rows.length;
@@ -225,9 +228,14 @@ export function DiscountCalculator(_: Props = {}) {
     let okRows = 0;
     let totalNota = 0;
     let sumDescNuevo = 0;
+    let totalInicial = 0;
     rows.forEach((r, i) => {
       const filled = r.codigo.trim() !== "" || r.precioFactura.trim() !== "";
       if (filled) articulos++;
+      const base = Number(String(r.precioFactura).replace(/\s/g, "").replace(",", "."));
+      const qtyRaw = Number(String(r.cantidad).replace(/\s/g, "").replace(",", "."));
+      const qty = Number.isFinite(qtyRaw) && qtyRaw > 0 ? qtyRaw : 1;
+      if (Number.isFinite(base) && base > 0) totalInicial += base * qty;
       const res = results[i];
       if (res.estado === "ok") {
         okRows++;
@@ -239,6 +247,7 @@ export function DiscountCalculator(_: Props = {}) {
       articulos,
       totalNota,
       avgDescNuevo: okRows > 0 ? sumDescNuevo / okRows : 0,
+      totalInicial,
     };
   }, [results, rows]);
 
@@ -435,8 +444,14 @@ export function DiscountCalculator(_: Props = {}) {
                 </th>
                 <th className="w-10 px-2 py-3 text-center">#</th>
                 <th className="col-input-bg px-3 py-3 text-left">Código</th>
-                <th className="col-input-bg px-3 py-3 text-right">Precio Inicial</th>
+                <th className="col-input-bg px-3 py-3 text-right">
+                  <div>Precio Inicial</div>
+                  <div className="mt-0.5 font-mono text-[11px] font-semibold normal-case tracking-normal text-foreground">
+                    Total: $ {fmtMoney(summary.totalInicial)}
+                  </div>
+                </th>
                 <th className="col-input-bg px-3 py-3 text-right">Oferta previa</th>
+                <th className="col-input-bg px-3 py-3 text-right">Cantidad</th>
                 <th
                   className={cn(
                     "px-3 py-3 text-right",
@@ -523,6 +538,20 @@ export function DiscountCalculator(_: Props = {}) {
                         placeholder="—"
                       />
                     </td>
+                    <td className="col-input-bg px-1 py-1">
+                      <input
+                        ref={setCellRef(i, 3)}
+                        className="cell-input h-10 text-right font-mono text-base"
+                        value={row.cantidad}
+                        onChange={(e) =>
+                          updateRow(row.id, { cantidad: e.target.value.replace(/[^\d.,-]/g, "") })
+                        }
+                        onPaste={handlePaste(i, 3)}
+                        onKeyDown={handleCellKeyDown(i, 3)}
+                        inputMode="decimal"
+                        placeholder="—"
+                      />
+                    </td>
                     <td
                       className={cn("px-1 py-1", mode !== "percent" && "bg-foreground")}
                     >
@@ -563,8 +592,8 @@ export function DiscountCalculator(_: Props = {}) {
                     </td>
                     <ResultCells
                       res={res}
-                      descNuevoRef={setCellRef(i, 3)}
-                      onDescNuevoKeyDown={handleCellKeyDown(i, 3)}
+                      descNuevoRef={setCellRef(i, 4)}
+                      onDescNuevoKeyDown={handleCellKeyDown(i, 4)}
                     />
                     <td className="px-2 text-center">
                       <button
