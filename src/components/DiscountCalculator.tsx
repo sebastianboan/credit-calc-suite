@@ -249,7 +249,7 @@ export function DiscountCalculator(_: Props = {}) {
         return {
           Codigo: r.codigo,
           "Descuento a cargar %":
-            res.descuentoNuevoPct != null ? Number(res.descuentoNuevoPct.toFixed(2)) : "",
+            res.descuentoNuevoPct != null ? -Math.abs(Number(res.descuentoNuevoPct.toFixed(2))) : "",
           "Nota credito a cargar":
             res.notaCredito != null ? Number(res.notaCredito.toFixed(2)) : "",
         };
