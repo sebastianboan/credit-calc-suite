@@ -56,6 +56,7 @@ export function computeRow(row: Row, mode: CalcMode): RowResult {
     row.codigo.trim() !== "" ||
     row.precioFactura.trim() !== "" ||
     row.oferta.trim() !== "" ||
+    row.cantidad.trim() !== "" ||
     row.targetPercent.trim() !== "" ||
     row.targetPrice.trim() !== "";
 
