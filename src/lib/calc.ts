@@ -123,7 +123,9 @@ export function computeRow(row: Row, mode: CalcMode): RowResult {
   const descuentoVisible =
     ((precioFacturadoVisible - precioFinalObjetivo) / precioFacturadoVisible) * 100;
   const precioConOfertaPrevia = precioBase * (1 - ofertaPrev / 100);
-  const notaCredito = precioConOfertaPrevia - precioFinalObjetivo;
+  const cantidad = parseNum(row.cantidad);
+  const qty = cantidad != null && cantidad > 0 ? cantidad : 1;
+  const notaCredito = (precioConOfertaPrevia - precioFinalObjetivo) * qty;
 
   if (descuentoNuevo < -0.0001) {
     return {
