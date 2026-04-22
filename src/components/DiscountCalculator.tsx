@@ -413,14 +413,14 @@ export function DiscountCalculator(_: Props = {}) {
       </section>
 
       {/* Summary */}
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard label="Artículos" value={String(summary.articulos ?? 0)} />
+        <SummaryCard label="Total Inicial" value={`$ ${fmtMoney(summary.totalInicial)}`} />
         <SummaryCard
           label="Total Nota de Crédito"
           value={`$ ${fmtMoney(summary.totalNota)}`}
           highlight
         />
-        <SummaryCard label="Promedio desc. nuevo" value={fmtPct(summary.avgDescNuevo)} />
         <TotalInvoiceCard
           value={bulkTotalPrice}
           onChange={setBulkTotalPrice}
