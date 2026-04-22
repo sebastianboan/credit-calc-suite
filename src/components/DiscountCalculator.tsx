@@ -635,7 +635,7 @@ function ResultCells({
   descNuevoRef?: (el: HTMLElement | null) => void;
   onDescNuevoKeyDown?: (e: KeyboardEvent<HTMLElement>) => void;
 }) {
-  const descText = res.descuentoNuevoPct != null ? fmtPct(res.descuentoNuevoPct) : "—";
+  const descText = res.descuentoNuevoPct != null ? `-${fmtPct(Math.abs(res.descuentoNuevoPct))}` : "—";
   return (
     <>
       <td className="result-cell result-cell-strong text-right text-base">
