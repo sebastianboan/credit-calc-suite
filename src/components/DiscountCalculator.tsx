@@ -635,35 +635,48 @@ function ResultCells({
   descNuevoRef?: (el: HTMLElement | null) => void;
   onDescNuevoKeyDown?: (e: KeyboardEvent<HTMLElement>) => void;
 }) {
-  const descText = res.descuentoNuevoPct != null ? `-${fmtPct(Math.abs(res.descuentoNuevoPct))}` : "—";
+  const fmtPlain = (n: number, digits = 2) =>
+    n.toLocaleString("es-AR", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+  const descText =
+    res.descuentoNuevoPct != null ? `-${fmtPlain(Math.abs(res.descuentoNuevoPct))}` : "—";
+  const notaText = res.notaCredito != null ? fmtPlain(res.notaCredito) : "—";
+  const copyOnFocus = (e: React.FocusEvent<HTMLDivElement>) => {
+    const range = document.createRange();
+    range.selectNodeContents(e.currentTarget);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+  };
   return (
     <>
       <td className="result-cell result-cell-strong text-right text-base">
         {res.precioFinalObjetivo != null ? `$${fmtMoney(res.precioFinalObjetivo)}` : "—"}
       </td>
       <td className="col-result-bg p-0">
-        {/* Read-only but focusable cell: navigable & copyable, not editable */}
         <div
           ref={descNuevoRef as (el: HTMLDivElement | null) => void}
           tabIndex={0}
           role="textbox"
           aria-readonly="true"
           onKeyDown={onDescNuevoKeyDown}
-          onFocus={(e) => {
-            const range = document.createRange();
-            range.selectNodeContents(e.currentTarget);
-            const sel = window.getSelection();
-            sel?.removeAllRanges();
-            sel?.addRange(range);
-          }}
+          onFocus={copyOnFocus}
           className="result-copy-cell"
           title="Solo lectura — usá Ctrl+C para copiar"
         >
           {descText}
         </div>
       </td>
-      <td className="col-result-bg result-cell text-right text-base font-semibold">
-        {res.notaCredito != null ? `$${fmtMoney(res.notaCredito)}` : "—"}
+      <td className="col-result-bg p-0">
+        <div
+          tabIndex={0}
+          role="textbox"
+          aria-readonly="true"
+          onFocus={copyOnFocus}
+          className="result-copy-cell"
+          title="Solo lectura — usá Ctrl+C para copiar"
+        >
+          {notaText}
+        </div>
       </td>
     </>
   );
