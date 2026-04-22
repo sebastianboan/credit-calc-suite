@@ -413,14 +413,14 @@ export function DiscountCalculator(_: Props = {}) {
       </section>
 
       {/* Summary */}
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard label="Artículos" value={String(summary.articulos ?? 0)} />
+        <SummaryCard label="Total Inicial" value={`$ ${fmtMoney(summary.totalInicial)}`} />
         <SummaryCard
           label="Total Nota de Crédito"
           value={`$ ${fmtMoney(summary.totalNota)}`}
           highlight
         />
-        <SummaryCard label="Promedio desc. nuevo" value={fmtPct(summary.avgDescNuevo)} />
         <TotalInvoiceCard
           value={bulkTotalPrice}
           onChange={setBulkTotalPrice}
@@ -444,12 +444,7 @@ export function DiscountCalculator(_: Props = {}) {
                 </th>
                 <th className="w-10 px-2 py-3 text-center">#</th>
                 <th className="col-input-bg px-3 py-3 text-left">Código</th>
-                <th className="col-input-bg px-3 py-3 text-right">
-                  <div>Precio Inicial</div>
-                  <div className="mt-0.5 font-mono text-[11px] font-semibold normal-case tracking-normal text-foreground">
-                    Total: $ {fmtMoney(summary.totalInicial)}
-                  </div>
-                </th>
+                <th className="col-input-bg px-3 py-3 text-right">Precio Inicial</th>
                 <th className="col-input-bg px-3 py-3 text-right">Oferta previa</th>
                 <th className="col-input-bg px-3 py-3 text-right">Cantidad</th>
                 <th
