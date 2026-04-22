@@ -538,6 +538,20 @@ export function DiscountCalculator(_: Props = {}) {
                         placeholder="—"
                       />
                     </td>
+                    <td className="col-input-bg px-1 py-1">
+                      <input
+                        ref={setCellRef(i, 3)}
+                        className="cell-input h-10 text-right font-mono text-base"
+                        value={row.cantidad}
+                        onChange={(e) =>
+                          updateRow(row.id, { cantidad: e.target.value.replace(/[^\d.,-]/g, "") })
+                        }
+                        onPaste={handlePaste(i, 3)}
+                        onKeyDown={handleCellKeyDown(i, 3)}
+                        inputMode="decimal"
+                        placeholder="—"
+                      />
+                    </td>
                     <td
                       className={cn("px-1 py-1", mode !== "percent" && "bg-foreground")}
                     >
