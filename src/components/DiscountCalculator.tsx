@@ -531,7 +531,7 @@ export function DiscountCalculator(_: Props = {}) {
                         onPaste={handlePaste(i, 1)}
                         onKeyDown={handleCellKeyDown(i, 1)}
                         inputMode="decimal"
-                        placeholder="0,00"
+                        placeholder="—"
                       />
                     </td>
                     <td className="col-input-bg px-1 py-1">
@@ -545,14 +545,16 @@ export function DiscountCalculator(_: Props = {}) {
                         onPaste={handlePaste(i, 2)}
                         onKeyDown={handleCellKeyDown(i, 2)}
                         inputMode="decimal"
-                        placeholder="0"
+                        placeholder="—"
                       />
                     </td>
-                    <td className="px-1 py-1">
+                    <td
+                      className={cn("px-1 py-1", mode !== "percent" && "bg-foreground")}
+                    >
                       <input
                         className={cn(
                           "cell-input h-10 text-right font-mono text-base",
-                          mode !== "percent" && "opacity-50",
+                          mode !== "percent" && "text-background opacity-60",
                         )}
                         value={row.targetPercent}
                         onChange={(e) =>
@@ -562,14 +564,16 @@ export function DiscountCalculator(_: Props = {}) {
                         }
                         disabled={mode !== "percent"}
                         inputMode="decimal"
-                        placeholder={mode === "percent" ? "20" : "—"}
+                        placeholder={mode === "percent" ? "—" : ""}
                       />
                     </td>
-                    <td className="px-1 py-1">
+                    <td
+                      className={cn("px-1 py-1", mode !== "price" && "bg-foreground")}
+                    >
                       <input
                         className={cn(
                           "cell-input h-10 text-right font-mono text-base",
-                          mode !== "price" && "opacity-50",
+                          mode !== "price" && "text-background opacity-60",
                         )}
                         value={row.targetPrice}
                         onChange={(e) =>
@@ -579,7 +583,7 @@ export function DiscountCalculator(_: Props = {}) {
                         }
                         disabled={mode !== "price"}
                         inputMode="decimal"
-                        placeholder={mode === "price" ? "0,00" : "—"}
+                        placeholder={mode === "price" ? "—" : ""}
                       />
                     </td>
                     <ResultCells
