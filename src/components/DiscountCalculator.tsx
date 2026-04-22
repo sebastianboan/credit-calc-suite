@@ -126,15 +126,17 @@ export function DiscountCalculator(_: Props = {}) {
     const target = Number(cleaned);
     if (!Number.isFinite(target) || target <= 0) return;
 
-    // Determine eligible rows (with valid precioFactura)
+    // Determine eligible rows (with valid precioFactura). Compute per-row TOTAL = precio * cantidad
     const eligibleIds = new Set<string>();
     let sumBase = 0;
     rows.forEach((r) => {
       if (selected.size > 0 && !selected.has(r.id)) return;
       const base = Number(String(r.precioFactura).replace(/\s/g, "").replace(",", "."));
+      const qtyRaw = Number(String(r.cantidad).replace(/\s/g, "").replace(",", "."));
+      const qty = Number.isFinite(qtyRaw) && qtyRaw > 0 ? qtyRaw : 1;
       if (Number.isFinite(base) && base > 0) {
         eligibleIds.add(r.id);
-        sumBase += base;
+        sumBase += base * qty;
       }
     });
     if (sumBase <= 0 || target > sumBase) return;
