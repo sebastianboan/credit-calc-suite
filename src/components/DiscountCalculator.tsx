@@ -26,7 +26,6 @@ import {
   Plus,
   Trash2,
   Eraser,
-  Download,
   FileSpreadsheet,
   Calculator,
   Wand2,
@@ -244,26 +243,18 @@ export function DiscountCalculator(_: Props = {}) {
   }, [results, rows]);
 
   const exportData = () => {
-    return rows.map((r, i) => {
-      const res = results[i];
-      return {
-        Codigo: r.codigo,
-        "Precio Factura": r.precioFactura,
-        "Oferta %": r.oferta,
-        "10.5% (global)": globalHas105 ? "Sí" : "No",
-        Modo: mode === "percent" ? "% final" : "Precio final",
-        "% Final Deseado": mode === "percent" ? r.targetPercent : "",
-        "Precio Final Deseado": mode === "price" ? r.targetPrice : "",
-        "Precio Base": res.precioBase ?? "",
-        "Precio Final Objetivo": res.precioFinalObjetivo ?? "",
-        "% Descuento Total": res.descuentoTotalPct ?? "",
-        "% Descuento Previo": res.descuentoPrevioPct ?? "",
-        "% Descuento Nuevo": res.descuentoNuevoPct ?? "",
-        "Nota de Crédito": res.notaCredito ?? "",
-        Estado: res.estado,
-        Observación: res.observacion,
-      };
-    });
+    return rows
+      .map((r, i) => {
+        const res = results[i];
+        return {
+          Codigo: r.codigo,
+          "Descuento a cargar %":
+            res.descuentoNuevoPct != null ? Number(res.descuentoNuevoPct.toFixed(2)) : "",
+          "Nota credito a cargar":
+            res.notaCredito != null ? Number(res.notaCredito.toFixed(2)) : "",
+        };
+      })
+      .filter((r) => r.Codigo !== "" || r["Nota credito a cargar"] !== "");
   };
 
   const exportXlsx = () => {
@@ -271,18 +262,6 @@ export function DiscountCalculator(_: Props = {}) {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Descuentos");
     XLSX.writeFile(wb, `descuentos_${new Date().toISOString().slice(0, 10)}.xlsx`);
-  };
-
-  const exportCsv = () => {
-    const ws = XLSX.utils.json_to_sheet(exportData());
-    const csv = XLSX.utils.sheet_to_csv(ws);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `descuentos_${new Date().toISOString().slice(0, 10)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   return (
@@ -419,10 +398,6 @@ export function DiscountCalculator(_: Props = {}) {
             <Button onClick={exportXlsx} size="lg" className="text-base">
               <FileSpreadsheet className="mr-2 h-5 w-5" />
               Excel
-            </Button>
-            <Button onClick={exportCsv} size="lg" variant="secondary" className="text-base">
-              <Download className="mr-2 h-5 w-5" />
-              CSV
             </Button>
           </div>
         </div>
