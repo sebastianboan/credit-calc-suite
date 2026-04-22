@@ -228,9 +228,14 @@ export function DiscountCalculator(_: Props = {}) {
     let okRows = 0;
     let totalNota = 0;
     let sumDescNuevo = 0;
+    let totalInicial = 0;
     rows.forEach((r, i) => {
       const filled = r.codigo.trim() !== "" || r.precioFactura.trim() !== "";
       if (filled) articulos++;
+      const base = Number(String(r.precioFactura).replace(/\s/g, "").replace(",", "."));
+      const qtyRaw = Number(String(r.cantidad).replace(/\s/g, "").replace(",", "."));
+      const qty = Number.isFinite(qtyRaw) && qtyRaw > 0 ? qtyRaw : 1;
+      if (Number.isFinite(base) && base > 0) totalInicial += base * qty;
       const res = results[i];
       if (res.estado === "ok") {
         okRows++;
@@ -242,6 +247,7 @@ export function DiscountCalculator(_: Props = {}) {
       articulos,
       totalNota,
       avgDescNuevo: okRows > 0 ? sumDescNuevo / okRows : 0,
+      totalInicial,
     };
   }, [results, rows]);
 
