@@ -167,7 +167,7 @@ export const newEmptyRow = (): Row => ({
   id: crypto.randomUUID(),
   codigo: "",
   precioFactura: "",
-  oferta: "0",
+  oferta: "",
   has105: false,
   targetPercent: "",
   targetPrice: "",

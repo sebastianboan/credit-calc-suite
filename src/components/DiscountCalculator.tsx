@@ -171,7 +171,7 @@ export function DiscountCalculator(_: Props = {}) {
             const val = cells[j].trim();
             if (ci === 0) patch.codigo = val;
             else if (ci === 1) patch.precioFactura = val.replace(/[^\d.,-]/g, "");
-            else if (ci === 2) patch.oferta = val.replace(/[^\d.,-]/g, "") || "0";
+            else if (ci === 2) patch.oferta = val.replace(/[^\d.,-]/g, "");
           }
           next[rowIndex + i] = { ...target, ...patch };
         }
@@ -460,17 +460,27 @@ export function DiscountCalculator(_: Props = {}) {
                 </th>
                 <th className="w-10 px-2 py-3 text-center">#</th>
                 <th className="col-input-bg px-3 py-3 text-left">Código</th>
-                <th className="col-input-bg px-3 py-3 text-right">Precio Factura</th>
-                <th className="col-input-bg px-3 py-3 text-right">Oferta %</th>
-                <th className="px-3 py-3 text-right">
-                  {mode === "percent" ? "% final ✱" : "% final"}
+                <th className="col-input-bg px-3 py-3 text-right">Precio Inicial</th>
+                <th className="col-input-bg px-3 py-3 text-right">Oferta previa</th>
+                <th
+                  className={cn(
+                    "px-3 py-3 text-right",
+                    mode !== "percent" && "bg-foreground text-background",
+                  )}
+                >
+                  Descuento total %
                 </th>
-                <th className="px-3 py-3 text-right">
-                  {mode === "price" ? "Precio final ✱" : "Precio final"}
+                <th
+                  className={cn(
+                    "px-3 py-3 text-right",
+                    mode !== "price" && "bg-foreground text-background",
+                  )}
+                >
+                  Precio a pagar
                 </th>
-                <th className="px-3 py-3 text-right">Precio Final Objetivo</th>
-                <th className="col-result-bg px-3 py-3 text-right">% Desc. Nuevo</th>
-                <th className="px-3 py-3 text-right">Nota Crédito</th>
+                <th className="px-3 py-3 text-right">Saldo total</th>
+                <th className="col-result-bg px-3 py-3 text-right">Descuento a cargar %</th>
+                <th className="col-result-bg px-3 py-3 text-right">Nota credito a cargar</th>
                 <th className="w-10 px-2 py-3"></th>
               </tr>
             </thead>
@@ -521,7 +531,7 @@ export function DiscountCalculator(_: Props = {}) {
                         onPaste={handlePaste(i, 1)}
                         onKeyDown={handleCellKeyDown(i, 1)}
                         inputMode="decimal"
-                        placeholder="0,00"
+                        placeholder="—"
                       />
                     </td>
                     <td className="col-input-bg px-1 py-1">
@@ -535,14 +545,16 @@ export function DiscountCalculator(_: Props = {}) {
                         onPaste={handlePaste(i, 2)}
                         onKeyDown={handleCellKeyDown(i, 2)}
                         inputMode="decimal"
-                        placeholder="0"
+                        placeholder="—"
                       />
                     </td>
-                    <td className="px-1 py-1">
+                    <td
+                      className={cn("px-1 py-1", mode !== "percent" && "bg-foreground")}
+                    >
                       <input
                         className={cn(
                           "cell-input h-10 text-right font-mono text-base",
-                          mode !== "percent" && "opacity-50",
+                          mode !== "percent" && "text-background opacity-60",
                         )}
                         value={row.targetPercent}
                         onChange={(e) =>
@@ -552,14 +564,16 @@ export function DiscountCalculator(_: Props = {}) {
                         }
                         disabled={mode !== "percent"}
                         inputMode="decimal"
-                        placeholder={mode === "percent" ? "20" : "—"}
+                        placeholder={mode === "percent" ? "—" : ""}
                       />
                     </td>
-                    <td className="px-1 py-1">
+                    <td
+                      className={cn("px-1 py-1", mode !== "price" && "bg-foreground")}
+                    >
                       <input
                         className={cn(
                           "cell-input h-10 text-right font-mono text-base",
-                          mode !== "price" && "opacity-50",
+                          mode !== "price" && "text-background opacity-60",
                         )}
                         value={row.targetPrice}
                         onChange={(e) =>
@@ -569,7 +583,7 @@ export function DiscountCalculator(_: Props = {}) {
                         }
                         disabled={mode !== "price"}
                         inputMode="decimal"
-                        placeholder={mode === "price" ? "0,00" : "—"}
+                        placeholder={mode === "price" ? "—" : ""}
                       />
                     </td>
                     <ResultCells
@@ -673,7 +687,7 @@ function ResultCells({
           {descText}
         </div>
       </td>
-      <td className="result-cell text-right text-base">
+      <td className="col-result-bg result-cell text-right text-base font-semibold">
         {res.notaCredito != null ? `$${fmtMoney(res.notaCredito)}` : "—"}
       </td>
     </>
