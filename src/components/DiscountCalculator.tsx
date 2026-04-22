@@ -460,17 +460,27 @@ export function DiscountCalculator(_: Props = {}) {
                 </th>
                 <th className="w-10 px-2 py-3 text-center">#</th>
                 <th className="col-input-bg px-3 py-3 text-left">Código</th>
-                <th className="col-input-bg px-3 py-3 text-right">Precio Factura</th>
-                <th className="col-input-bg px-3 py-3 text-right">Oferta %</th>
-                <th className="px-3 py-3 text-right">
-                  {mode === "percent" ? "% final ✱" : "% final"}
+                <th className="col-input-bg px-3 py-3 text-right">Precio Inicial</th>
+                <th className="col-input-bg px-3 py-3 text-right">Oferta previa</th>
+                <th
+                  className={cn(
+                    "px-3 py-3 text-right",
+                    mode !== "percent" && "bg-foreground text-background",
+                  )}
+                >
+                  Descuento total %
                 </th>
-                <th className="px-3 py-3 text-right">
-                  {mode === "price" ? "Precio final ✱" : "Precio final"}
+                <th
+                  className={cn(
+                    "px-3 py-3 text-right",
+                    mode !== "price" && "bg-foreground text-background",
+                  )}
+                >
+                  Precio a pagar
                 </th>
-                <th className="px-3 py-3 text-right">Precio Final Objetivo</th>
-                <th className="col-result-bg px-3 py-3 text-right">% Desc. Nuevo</th>
-                <th className="px-3 py-3 text-right">Nota Crédito</th>
+                <th className="px-3 py-3 text-right">Saldo total</th>
+                <th className="col-result-bg px-3 py-3 text-right">Descuento a cargar %</th>
+                <th className="col-result-bg px-3 py-3 text-right">Nota credito a cargar</th>
                 <th className="w-10 px-2 py-3"></th>
               </tr>
             </thead>
