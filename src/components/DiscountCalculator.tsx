@@ -400,10 +400,6 @@ export function DiscountCalculator(_: Props = {}) {
               <FileSpreadsheet className="mr-2 h-5 w-5" />
               Excel
             </Button>
-            <Button onClick={exportCsv} size="lg" variant="secondary" className="text-base">
-              <Download className="mr-2 h-5 w-5" />
-              CSV
-            </Button>
           </div>
         </div>
       </section>
