@@ -69,12 +69,18 @@ export function computeRow(row: Row, mode: CalcMode): RowResult {
     return { ...empty, estado: "error", observacion: "La oferta previa no puede ser negativa" };
   }
 
-  const precioFacturadoVisible = row.has105 ? precioBase * 1.105 : precioBase;
+  const precioFacturadoVisible = precioBase;
 
   let descuentoTotal: number | null = null;
   let precioFinalObjetivo: number | null = null;
 
-  if (mode === "percent") {
+  // Modo "Restar 10,5%": el precio inicial YA incluye un recargo del 10,5%.
+  // Objetivo: dejar el precio final = precioBase / 1.105 (es decir, descontar el 10,5% de recargo, que equivale a un descuento total ≈ 9,5023%).
+  // Esto ignora los inputs de target del usuario.
+  if (row.has105) {
+    precioFinalObjetivo = precioBase / 1.105;
+    descuentoTotal = (1 - 1 / 1.105) * 100;
+  } else if (mode === "percent") {
     if (targetPctRaw == null) {
       return {
         ...empty,
