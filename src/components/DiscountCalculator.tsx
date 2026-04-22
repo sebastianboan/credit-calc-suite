@@ -687,7 +687,7 @@ function ResultCells({
           {descText}
         </div>
       </td>
-      <td className="result-cell text-right text-base">
+      <td className="col-result-bg result-cell text-right text-base font-semibold">
         {res.notaCredito != null ? `$${fmtMoney(res.notaCredito)}` : "—"}
       </td>
     </>
