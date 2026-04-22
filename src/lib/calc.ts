@@ -5,6 +5,7 @@ export interface Row {
   codigo: string;
   precioFactura: string; // raw input
   oferta: string; // %
+  cantidad: string; // unidades
   has105: boolean;
   // per-row target (used when not using global)
   targetPercent: string;
