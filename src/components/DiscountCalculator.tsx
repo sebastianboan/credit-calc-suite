@@ -444,8 +444,14 @@ export function DiscountCalculator(_: Props = {}) {
                 </th>
                 <th className="w-10 px-2 py-3 text-center">#</th>
                 <th className="col-input-bg px-3 py-3 text-left">Código</th>
-                <th className="col-input-bg px-3 py-3 text-right">Precio Inicial</th>
+                <th className="col-input-bg px-3 py-3 text-right">
+                  <div>Precio Inicial</div>
+                  <div className="mt-0.5 font-mono text-[11px] font-semibold normal-case tracking-normal text-foreground">
+                    Total: $ {fmtMoney(summary.totalInicial)}
+                  </div>
+                </th>
                 <th className="col-input-bg px-3 py-3 text-right">Oferta previa</th>
+                <th className="col-input-bg px-3 py-3 text-right">Cantidad</th>
                 <th
                   className={cn(
                     "px-3 py-3 text-right",
