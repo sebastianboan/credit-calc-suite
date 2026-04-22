@@ -26,7 +26,6 @@ import {
   Plus,
   Trash2,
   Eraser,
-  Download,
   FileSpreadsheet,
   Calculator,
   Wand2,
