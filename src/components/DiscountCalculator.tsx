@@ -283,11 +283,8 @@ export function DiscountCalculator(_: Props = {}) {
           </div>
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">
-              Calculadora de Descuentos & Notas de Crédito
+              Calculadora de Notas de Credito
             </h1>
-            <p className="text-sm text-muted-foreground">
-              Cálculo exacto sobre precio base, edición tipo Excel.
-            </p>
           </div>
         </div>
       </header>
