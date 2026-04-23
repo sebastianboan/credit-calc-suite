@@ -10,11 +10,4 @@ export default defineConfig({
   vite: {
     base: "/business/calculadora/",
   },
-  tanstackStart: {
-    prerender: {
-      enabled: true,
-      crawlLinks: true,
-    },
-    pages: [{ path: "/" }],
-  },
 });
