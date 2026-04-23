@@ -183,8 +183,46 @@ export const fmtMoney = (n: number | null, digits = 2) =>
 export const fmtPct = (n: number | null, digits = 2) =>
   n == null ? "—" : `${n.toLocaleString("es-AR", { minimumFractionDigits: digits, maximumFractionDigits: digits })}%`;
 
+// UUID v4 generator que funciona en HTTP (sin depender de crypto.randomUUID,
+// que el navegador solo expone en contextos seguros: HTTPS o localhost).
+const generateId = (): string => {
+  const g: any = (typeof globalThis !== "undefined" ? globalThis : {}) as any;
+  // 1) Usar crypto.randomUUID si está disponible (HTTPS / localhost)
+  if (g.crypto && typeof g.crypto.randomUUID === "function") {
+    try {
+      return g.crypto.randomUUID();
+    } catch {
+      /* fallthrough */
+    }
+  }
+  // 2) Usar crypto.getRandomValues si existe (disponible también en HTTP en navegadores modernos)
+  if (g.crypto && typeof g.crypto.getRandomValues === "function") {
+    const bytes = new Uint8Array(16);
+    g.crypto.getRandomValues(bytes);
+    // Ajustar bits de versión (4) y variante (10xx) según RFC 4122
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex: string[] = [];
+    for (let i = 0; i < 256; i++) hex.push((i + 0x100).toString(16).slice(1));
+    return (
+      hex[bytes[0]] + hex[bytes[1]] + hex[bytes[2]] + hex[bytes[3]] + "-" +
+      hex[bytes[4]] + hex[bytes[5]] + "-" +
+      hex[bytes[6]] + hex[bytes[7]] + "-" +
+      hex[bytes[8]] + hex[bytes[9]] + "-" +
+      hex[bytes[10]] + hex[bytes[11]] + hex[bytes[12]] +
+      hex[bytes[13]] + hex[bytes[14]] + hex[bytes[15]]
+    );
+  }
+  // 3) Fallback final basado en Math.random (no criptográfico, suficiente para IDs locales de UI)
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+};
+
 export const newEmptyRow = (): Row => ({
-  id: crypto.randomUUID(),
+  id: generateId(),
   codigo: "",
   precioFactura: "",
   oferta: "",
