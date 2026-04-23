@@ -384,16 +384,6 @@ export function DiscountCalculator(_: Props = {}) {
             <Plus className="mr-2 h-5 w-5" />
             Agregar fila
           </Button>
-          <Button
-            onClick={deleteSelected}
-            variant="outline"
-            size="lg"
-            className="text-base"
-            disabled={selected.size === 0}
-          >
-            <Trash2 className="mr-2 h-5 w-5" />
-            Borrar selección
-          </Button>
           <Button onClick={clearAll} variant="outline" size="lg" className="text-base">
             <Eraser className="mr-2 h-5 w-5" />
             Limpiar todo
