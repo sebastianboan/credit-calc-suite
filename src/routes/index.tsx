@@ -5,7 +5,7 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Calculadora de Descuentos & Notas de Crédito" },
+      { title: "Calculadora de Notas de Credito" },
       {
         name: "description",
         content:
