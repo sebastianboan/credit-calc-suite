@@ -75,11 +75,21 @@ export function computeRow(row: Row, mode: CalcMode): RowResult {
   let precioFinalObjetivo: number | null = null;
 
   // Modo "Restar 10,5%": el precio inicial YA incluye un recargo del 10,5%.
-  // Objetivo: dejar el precio final = precioBase / 1.105 (es decir, descontar el 10,5% de recargo, que equivale a un descuento total ≈ 9,5023%).
-  // Esto ignora los inputs de target del usuario.
+  // Objetivo final: precio = precioBase / 1.105.
+  // Si hay oferta previa, esa oferta ya se aplicó sobre el precio con recargo,
+  // por lo que ya descontó "de más" parte del 10,5%. El descuento adicional a
+  // cargar se calcula sobre el precio que quedó tras la oferta previa para
+  // llegar exactamente al objetivo.
   if (row.has105) {
     precioFinalObjetivo = precioBase / 1.105;
-    descuentoTotal = (1 - 1 / 1.105) * 100;
+    const precioTrasOferta = precioBase * (1 - ofertaPrev / 100);
+    if (precioTrasOferta <= 0) {
+      descuentoTotal = 0;
+    } else {
+      // % a cargar sobre el precio facturado (precioBase) para que, sumado a
+      // la oferta previa, lleve el precio a precioFinalObjetivo.
+      descuentoTotal = ((precioTrasOferta - precioFinalObjetivo) / precioBase) * 100 + ofertaPrev;
+    }
   } else if (mode === "percent") {
     if (targetPctRaw == null) {
       return {
