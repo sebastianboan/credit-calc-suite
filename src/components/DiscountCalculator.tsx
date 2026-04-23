@@ -120,31 +120,42 @@ export function DiscountCalculator(_: Props = {}) {
   };
 
   // Apply a global TOTAL invoice price across selected (or all) valid rows.
-  // Computes the uniform % discount needed so the sum of final prices equals the target total.
+  // Distribuye un % EXTRA uniforme sobre los precios iniciales, sumándose a la
+  // oferta previa de cada fila, de modo que la suma de precios finales = target.
+  // Fórmula: extraPct = (sumConOfertaPrevia - target) / sumBase * 100
+  // targetPercent por fila = ofertaPrevia + extraPct
   const applyBulkTotalPrice = () => {
     const cleaned = bulkTotalPrice.replace(/\s/g, "").replace(",", ".");
     const target = Number(cleaned);
     if (!Number.isFinite(target) || target <= 0) return;
 
-    // Determine eligible rows (with valid precioFactura). Compute per-row TOTAL = precio * cantidad
     const eligibleIds = new Set<string>();
     let sumBase = 0;
+    let sumConOferta = 0;
     rows.forEach((r) => {
       if (selected.size > 0 && !selected.has(r.id)) return;
       const base = Number(String(r.precioFactura).replace(/\s/g, "").replace(",", "."));
       const qtyRaw = Number(String(r.cantidad).replace(/\s/g, "").replace(",", "."));
       const qty = Number.isFinite(qtyRaw) && qtyRaw > 0 ? qtyRaw : 1;
+      const ofertaRaw = Number(String(r.oferta).replace(/\s/g, "").replace(",", "."));
+      const oferta = Number.isFinite(ofertaRaw) && ofertaRaw >= 0 ? ofertaRaw : 0;
       if (Number.isFinite(base) && base > 0) {
         eligibleIds.add(r.id);
         sumBase += base * qty;
+        sumConOferta += base * (1 - oferta / 100) * qty;
       }
     });
-    if (sumBase <= 0 || target > sumBase) return;
-    const pct = (1 - target / sumBase) * 100;
-    const pctStr = pct.toFixed(2);
+    if (sumBase <= 0 || target > sumConOferta) return;
+    const extraPct = ((sumConOferta - target) / sumBase) * 100;
     setMode("percent");
     setRows((rs) =>
-      rs.map((r) => (eligibleIds.has(r.id) ? { ...r, targetPercent: pctStr } : r)),
+      rs.map((r) => {
+        if (!eligibleIds.has(r.id)) return r;
+        const ofertaRaw = Number(String(r.oferta).replace(/\s/g, "").replace(",", "."));
+        const oferta = Number.isFinite(ofertaRaw) && ofertaRaw >= 0 ? ofertaRaw : 0;
+        const targetPct = oferta + extraPct;
+        return { ...r, targetPercent: targetPct.toFixed(2) };
+      }),
     );
   };
 
