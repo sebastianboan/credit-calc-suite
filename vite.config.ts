@@ -10,4 +10,14 @@ export default defineConfig({
   vite: {
     base: "/business/calculadora/",
   },
+  // Disable Cloudflare Workers target so the build emits a Node server bundle
+  // (dist/server/server.js) — required by the prerender step to generate index.html.
+  cloudflare: false,
+  tanstackStart: {
+    prerender: {
+      enabled: true,
+      crawlLinks: true,
+    },
+    pages: [{ path: "/" }],
+  },
 });
