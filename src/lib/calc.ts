@@ -82,14 +82,11 @@ export function computeRow(row: Row, mode: CalcMode): RowResult {
   // llegar exactamente al objetivo.
   if (row.has105) {
     precioFinalObjetivo = precioBase / 1.105;
-    const precioTrasOferta = precioBase * (1 - ofertaPrev / 100);
-    if (precioTrasOferta <= 0) {
-      descuentoTotal = 0;
-    } else {
-      // % a cargar sobre el precio facturado (precioBase) para que, sumado a
-      // la oferta previa, lleve el precio a precioFinalObjetivo.
-      descuentoTotal = ((precioTrasOferta - precioFinalObjetivo) / precioBase) * 100 + ofertaPrev;
-    }
+    // Descuento adicional a cargar sobre el precio ya con oferta previa:
+    //   (1 - 1/1.105) * (1 - ofertaPrev/100) * 100
+    // descuentoTotal = ofertaPrev + descAdicional => descuentoNuevo (a cargar) = descAdicional
+    const descAdicional = (1 - 1 / 1.105) * (1 - ofertaPrev / 100) * 100;
+    descuentoTotal = ofertaPrev + descAdicional;
   } else if (mode === "percent") {
     if (targetPctRaw == null) {
       return {
