@@ -139,7 +139,9 @@ export function computeRow(row: Row, mode: CalcMode): RowResult {
   const precioConOfertaPrevia = precioBase * (1 - ofertaPrev / 100);
   const cantidad = parseNum(row.cantidad);
   const qty = cantidad != null && cantidad > 0 ? cantidad : 1;
-  const notaCredito = (precioConOfertaPrevia - precioFinalObjetivo) * qty;
+  const notaCredito = row.has105
+    ? precioBase * (1 - 1 / 1.105) * (1 - ofertaPrev / 100) * qty
+    : (precioConOfertaPrevia - precioFinalObjetivo) * qty;
 
   if (descuentoNuevo < -0.0001) {
     return {
